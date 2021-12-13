@@ -6,5 +6,6 @@ target 'OpenPose' do
   use_frameworks!
 
   # Pods for OpenPose
-  pod "OpenCV"
+  pod 'Upsurge', '~> 0.10.2'
+  pod 'OpenCV', '~> 3.3.1'
 end

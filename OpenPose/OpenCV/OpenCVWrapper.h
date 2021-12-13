@@ -37,6 +37,26 @@
     +(UIImage *) visualizeHeatmap: (MLMultiArray *) array
                                    heatmapShape:(const int *) heatmapShape
                                    inputImage: (UIImage *) inputImage;
+
+
+-(void) matrixMin: (double *) data
+        data_size:(int)data_size
+        data_rows:(int)data_rows
+        heat_rows:(int)heat_rows
+;
+
+-(void) maximum_filter: (double *) data
+             data_size:(int)data_size
+             data_rows:(int)data_rows
+             mask_size:(int)mask_size
+             threshold:(double)threshold
+;
+
+-(UIImage*) renderKeyPoint:(CGRect) bounds
+                  keypoint:(int*) keypoint
+             keypoint_size:(int) keypoint_size
+                       pos:(CGPoint*) pos
+;
 @end
 
 #endif /* OpenCVWrapper_h */
