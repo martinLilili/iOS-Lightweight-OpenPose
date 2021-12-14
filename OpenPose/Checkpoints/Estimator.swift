@@ -217,7 +217,7 @@ class PoseEstimator {
     func estimate (heatmap : Array<Double>, paf : Array<Double>) -> [Human] {
         let startTime4 = CFAbsoluteTimeGetCurrent()
         
-        let separateLen = 19*heatRows*heatColumns
+//        let separateLen = 19*heatRows*heatColumns
         let pafMat = Matrix<Double>(rows: 38, columns: heatRows*heatColumns,
                                     elements: Array<Double>(paf))
         
@@ -231,7 +231,7 @@ class PoseEstimator {
         let heatMat = Matrix<Double>(rows: 19, columns: heatRows*heatColumns, elements: data )
         
         let timeElapsed4 = CFAbsoluteTimeGetCurrent() - startTime4
-//        print("init elapsed for \(timeElapsed4) seconds")
+        print("init elapsed for \(timeElapsed4) seconds")
         
         let startTime3 = CFAbsoluteTimeGetCurrent()
         

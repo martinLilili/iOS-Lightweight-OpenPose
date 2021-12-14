@@ -10,6 +10,7 @@
 		20835D1227645365006E5224 /* ios_conversions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 20835D1127645365006E5224 /* ios_conversions.mm */; };
 		20835D17276453D5006E5224 /* Estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20835D15276453D5006E5224 /* Estimator.swift */; };
 		20835D18276453D5006E5224 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20835D16276453D5006E5224 /* Common.swift */; };
+		20C41E952768332300C78EDD /* MobileOpenPose.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 20C41E942768332300C78EDD /* MobileOpenPose.mlmodel */; };
 		B529C48222E7E8FD00E54D7E /* OpenCVImageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B529C48122E7E8FD00E54D7E /* OpenCVImageController.swift */; };
 		B529C48822E7FDC500E54D7E /* OpenCVWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = B529C48722E7FDC500E54D7E /* OpenCVWrapper.mm */; };
 		B529C48B22E828DA00E54D7E /* DeviceInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B529C48A22E828D900E54D7E /* DeviceInput.swift */; };
@@ -40,6 +41,7 @@
 		20835D1127645365006E5224 /* ios_conversions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ios_conversions.mm; sourceTree = "<group>"; };
 		20835D15276453D5006E5224 /* Estimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Estimator.swift; sourceTree = "<group>"; };
 		20835D16276453D5006E5224 /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
+		20C41E942768332300C78EDD /* MobileOpenPose.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileOpenPose.mlmodel; sourceTree = "<group>"; };
 		47A3F9FA9DBA6850F53D4740 /* Pods_OpenPose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenPose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B529C48122E7E8FD00E54D7E /* OpenCVImageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenCVImageController.swift; sourceTree = "<group>"; };
 		B529C48422E7FD8E00E54D7E /* OpenPose-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OpenPose-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 		B53E38BF22E01D47004229E0 /* Checkpoints */ = {
 			isa = PBXGroup;
 			children = (
+				20C41E942768332300C78EDD /* MobileOpenPose.mlmodel */,
 				B5A146E122E6E04200BDF34E /* pose_368.mlmodel */,
 				20835D16276453D5006E5224 /* Common.swift */,
 				20835D15276453D5006E5224 /* Estimator.swift */,
@@ -328,6 +331,7 @@
 				B5A5D55522EE9634008B40A4 /* HeatmapVideoController.swift in Sources */,
 				B5C67BC222E585D600341542 /* DrawingHeatmapView.swift in Sources */,
 				20835D1227645365006E5224 /* ios_conversions.mm in Sources */,
+				20C41E952768332300C78EDD /* MobileOpenPose.mlmodel in Sources */,
 				B5A146E222E6E04200BDF34E /* pose_368.mlmodel in Sources */,
 				B529C48222E7E8FD00E54D7E /* OpenCVImageController.swift in Sources */,
 				B53E38BD22E01A00004229E0 /* UIImage+CoreML.swift in Sources */,
@@ -493,7 +497,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "OpenPose/OpenCV/OpenPose-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -514,7 +518,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "OpenPose/OpenCV/OpenPose-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

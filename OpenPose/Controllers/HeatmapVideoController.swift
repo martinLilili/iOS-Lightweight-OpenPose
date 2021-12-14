@@ -14,9 +14,12 @@ class HeatmapVideoController: UIViewController {
 
     @IBOutlet weak var imageView: UIImageView!
     
-    let serialQueue = DispatchQueue.init(label: "", qos: .default, attributes: [.concurrent], autoreleaseFrequency: .inherit, target: nil)
+    let serialQueue = DispatchQueue(label: "openpose", qos: .userInteractive, attributes: [.concurrent], autoreleaseFrequency: .workItem, target: nil)
     
     let model = pose_368()
+    let model1 = MobileOpenPose()
+    
+    var useLightPose = true
     
     let ImageWidth = 368
     let ImageHeight = 368
@@ -61,65 +64,85 @@ class HeatmapVideoController: UIViewController {
     
     func process(input: UIImage, complition: @escaping FilterCompletion) {
         print("process start ")
-        // resize the image
-        guard let inputImage = input.resize(to: CGSize(width: 368, height: 368)) else {
-            complition(nil, InferenceError.resizeError)
+        if self.isProgressing {
             return
         }
-        
-        // convert the image
-        guard let cvBufferInput = inputImage.pixelBuffer() else{
-            complition(nil, InferenceError.pixelBufferError)
-            return
-        }
-        
-        // feed the image to the neural network
-        guard let output = try? self.model.prediction(input_image: cvBufferInput) else {
-            complition(nil, InferenceError.predictionError)
-            return
-        }
-        
-        //
-        // process the heatnap
-        // output.heat_map_2 => (1,1,n, w, h)
-        //
-        let keypoint_number = output.heat_map_2.shape[2].int32Value
-        let heatmap_w = output.heat_map_2.shape[3].int32Value
-        let heatmap_h = output.heat_map_2.shape[4].int32Value
-        
-//        print("keypoint_number = \(keypoint_number), heatmap_w = \(heatmap_w), heatmap_h = \(heatmap_h)")
-        
-        var tensorShape:[Int32] = [heatmap_w, heatmap_h, keypoint_number]
-        let convertedHeatMap = OpenCVWrapper.visualizeHeatmap(
-                                                output.heat_map_2,
-                                                heatmapShape: &tensorShape,
-                                                inputImage: input)
-        
-        
-        
-        
-        
+        self.isProgressing = true
+    
         serialQueue.async {
-            if self.isProgressing {
+            
+            
+            let startTime = CFAbsoluteTimeGetCurrent()
+            // resize the image
+            guard let inputImage = input.resize(to: CGSize(width: 368, height: 368)) else {
+                complition(nil, InferenceError.resizeError)
                 return
             }
-            let startTime = CFAbsoluteTimeGetCurrent()
-            self.isProgressing = true
-            let pafarr = self.getArr(mlarr: output.paf_2)
-            let heatmaparr = self.getArr(mlarr: output.heat_map_2)
-            let com = PoseEstimator(368,368)
-            let humans = com.estimate(heatmap: heatmaparr.asArrayOfDouble, paf: pafarr.asArrayOfDouble)
-            print("got humans = \(humans.count)")
-            DispatchQueue.main.async {
-                self.lines.map { layer in
-                    layer.removeFromSuperlayer()
-                }
-                self.lines.removeAll()
-                self.drawLine(humans: humans)
-                self.isProgressing = false
-                let timePrigress = CFAbsoluteTimeGetCurrent() - startTime
-                print("progres for \(timePrigress) seconds")
+            
+            // convert the image
+            guard let cvBufferInput = inputImage.pixelBuffer() else{
+                complition(nil, InferenceError.pixelBufferError)
+                return
             }
+            
+            // feed the image to the neural network
+            if self.useLightPose {
+                
+                guard let output = try? self.model.prediction(input_image: cvBufferInput) else {
+                    complition(nil, InferenceError.predictionError)
+                    return
+                }
+                
+                let pafarr = self.getArr(mlarr: output.paf_2)
+                let heatmaparr = self.getArr(mlarr: output.heat_map_2)
+                let com = PoseEstimator(368,368)
+                let startTime = CFAbsoluteTimeGetCurrent()
+                let humans = com.estimate(heatmap: heatmaparr.asArrayOfDouble, paf: pafarr.asArrayOfDouble)
+                print("got humans = \(humans.count)")
+                let timePrigress = CFAbsoluteTimeGetCurrent() - startTime
+                print("progres2 for \(timePrigress) seconds + \(Thread.current)")
+
+                DispatchQueue.main.async {
+                    self.lines.map { layer in
+                        layer.removeFromSuperlayer()
+                    }
+                    self.lines.removeAll()
+                    self.drawLine(humans: humans)
+                    self.isProgressing = false
+
+                }
+            } else {
+                
+                guard let output = try? self.model1.prediction(image: cvBufferInput) else {
+                    complition(nil, InferenceError.predictionError)
+                    return
+                }
+                
+                let mlarray = output.net_output
+                let length = mlarray.count
+                let doublePtr =  mlarray.dataPointer.bindMemory(to: Double.self, capacity: length)
+                let doubleBuffer = UnsafeBufferPointer(start: doublePtr, count: length)
+                print("handleClassification length \(length)")
+                let mm = Array(doubleBuffer)
+                let com = PoseEstimator(368,368)
+                let humans = com.estimate(mm)
+                print("got humans = \(humans.count)")
+                
+                let timePrigress = CFAbsoluteTimeGetCurrent() - startTime
+                print("progres2 for \(timePrigress) seconds")
+
+                DispatchQueue.main.async {
+                    self.lines.map { layer in
+                        layer.removeFromSuperlayer()
+                    }
+                    self.lines.removeAll()
+                    self.drawLine(humans: humans)
+                    self.isProgressing = false
+
+                }
+                
+            }
+            
         }
         
         
@@ -138,7 +161,7 @@ class HeatmapVideoController: UIViewController {
 
 //
 //        self.imageView.image = convertedHeatMap
-        print("process end ")
+//        print("process end ")
     } // process
     
     
@@ -217,12 +240,13 @@ extension HeatmapVideoController: AVCaptureVideoDataOutputSampleBufferDelegate {
 
         if let captureImage = buffer.toUIImage() {
             DispatchQueue.main.sync {
+                self.imageView.contentMode = .scaleAspectFit
                 self.imageView.image = captureImage
                 let w = imageView.frame.width
                 let h = w * ((imageView.image?.size.height)!/(imageView.image?.size.width)!)
                 scaleX = w/368
                 scaleY = h/368
-                magrin = (imageView.frame.height - h)/2
+                magrin = (imageView.frame.height - h)/2 + imageView.frame.origin.y
                 self.process(input: self.imageView.image!) { image, error in
                     print(error)
                 }
